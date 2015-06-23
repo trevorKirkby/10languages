@@ -1,6 +1,7 @@
 from babel_network import *
 import math
 import time
+import gzip
 
 connection = socket(1234)
 connection.connect("localhost")
@@ -80,3 +81,58 @@ def solution3():
 		print "error, server has not responded correctly"
 	else:
 		print "solution successful"
+
+def solution4():
+	connection.send("plates")
+	print "sent \"plates\"\n"
+	feedback = connection.recv(False)
+	print "recieved "+str(feedback)
+	L1 = feedback[1].lower()
+	L2 = feedback[2].lower()
+	L3 = feedback[3].lower()
+	f = gzip.open('wordlist.dat.gz','rb')
+	dictionary = f.read()
+	answer = ""
+	solutions = {}
+	for word in dictionary.split("\n"):
+		points = 0
+		firsts = [i for i, letter in enumerate(word) if letter == L1]
+		if len(firsts):
+			for first in firsts:
+				remaining = word[first:]
+				if remaining != word:
+					points += 1
+				remaining = remaining[1:]
+				seconds = [i for i, letter in enumerate(remaining) if letter == L2]
+				if len(seconds):
+					for second in seconds:
+						endsecond = first+1+second
+						remaining2 = remaining[second:]
+						if remaining2 != remaining:
+							points += 1
+						remaining2 = remaining2[1:]
+						thirds = [i for i, letter in enumerate(remaining2) if letter == L3]
+						if len(thirds):
+							for third in thirds:
+								endthird = first+1+second+1+third
+								remaining3 = remaining2[third:]
+								if remaining3 != remaining2:
+									points += 1
+								remaining3 = remaining3[1:]
+								if remaining3 != "":
+									points += 1
+								solutions[points] = [word,first,endsecond,endthird]
+								points = 0
+						points = 0
+				points = 0
+	if len(solutions.keys()):
+		data = solutions[max(solutions.keys())]
+		answer = "".join(c.upper() if i in data[1:] else c for i, c in enumerate(data[0]))
+		connection.send(answer)
+		print "sent '"+str(answer)+"'\n"
+		feedback = connection.recv(False)
+		print "recieved "+str(feedback)
+		if feedback != "\"yes\"\n":
+			print "error, server has not responded correctly"
+		else:
+			print "solution successful"
