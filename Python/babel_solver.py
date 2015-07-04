@@ -90,7 +90,7 @@ def solution4():
 	L1 = feedback[1].lower()
 	L2 = feedback[2].lower()
 	L3 = feedback[3].lower()
-	f = gzip.open('wordlist.dat.gz','rb')
+	f = gzip.open('../wordlist.dat.gz','rb')
 	dictionary = f.read()
 	answer = ""
 	solutions = {}

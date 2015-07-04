@@ -20,11 +20,13 @@ int main()
 	struct hostent *server;
 	char buffer[256];
 	portno = 1234;
+
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0)
 	{
 		error("Error opening socket.");
 	}
+
 	server = gethostbyname("localhost");
 	bzero((char *) & serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family = AF_INET;
@@ -34,8 +36,10 @@ int main()
 		server->h_length
 	);
 	serv_addr.sin_port = htons(portno);
+
 	if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
 		error("Error connecting");
+
 	while (1) //Infinite interactive loop until keyboard interrupt. I could code in text based exit, but w/e.
 	{
 		printf("Please enter text to send: ");
@@ -46,6 +50,7 @@ int main()
 		{
 			error("Error writing to socket.");
 		}
+
 		bzero(buffer,256);
 		n = read(sockfd,buffer,255);
 		if (n < 0)
@@ -54,5 +59,6 @@ int main()
 		}
 		printf("%s",buffer);
 	}
+
 	return 0;
 }
